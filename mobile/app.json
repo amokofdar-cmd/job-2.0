@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "job-2.0",
+    "slug": "job-2-0-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"]
+  }
+}
