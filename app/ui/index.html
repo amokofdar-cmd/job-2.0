@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>job-2.0 | Autonomous Job Ops</title>
+    <link rel="stylesheet" href="/ui/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>job-2.0 Control Center</h1>
+      <p>Discover, score, and apply continuously with human-in-the-loop controls.</p>
+      <div class="actions">
+        <button id="refreshBtn">Refresh</button>
+        <button id="runOnceBtn">Run Autopilot Once</button>
+        <button id="seedBtn">Seed Demo Data</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>Metrics</h2>
+        <div id="metrics" class="metrics"></div>
+      </section>
+
+      <section class="panel two-col">
+        <div>
+          <h2>Create Candidate Profile</h2>
+          <form id="profileForm">
+            <input name="full_name" placeholder="Full name" required />
+            <input type="email" name="email" placeholder="Email" required />
+            <input name="linkedin_url" placeholder="LinkedIn URL (optional)" />
+            <textarea name="master_resume" placeholder="Master resume text" required></textarea>
+            <button type="submit">Save Profile</button>
+          </form>
+        </div>
+
+        <div>
+          <h2>Add Job</h2>
+          <form id="jobForm">
+            <input name="source" placeholder="Source (e.g. greenhouse)" required />
+            <input name="company" placeholder="Company" required />
+            <input name="title" placeholder="Title" required />
+            <input name="location" placeholder="Location" />
+            <input name="url" placeholder="Job URL" required />
+            <textarea name="description" placeholder="Job description" required></textarea>
+            <button type="submit">Save Job</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Profiles</h2>
+        <div id="profiles"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Jobs</h2>
+        <div class="filters">
+          <label>
+            Tier
+            <select id="tierFilter">
+              <option value="">All</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </label>
+          <label>
+            Applied
+            <select id="appliedFilter">
+              <option value="">All</option>
+              <option value="true">Applied</option>
+              <option value="false">Pending</option>
+            </select>
+          </label>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Company</th>
+              <th>Role</th>
+              <th>Tier</th>
+              <th>Score</th>
+              <th>Applied</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="jobsBody"></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>Application Attempts</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Job</th>
+              <th>Channel</th>
+              <th>Status</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="attemptsBody"></tbody>
+        </table>
+      </section>
+
+      <section class="panel two-col">
+        <div>
+          <h2>Question Memory</h2>
+          <form id="questionForm">
+            <textarea name="question_text" placeholder="Question text" required></textarea>
+            <textarea name="answer_text" placeholder="Answer" required></textarea>
+            <label><input type="checkbox" name="approved" checked /> Approved</label>
+            <button type="submit">Save Q&A</button>
+          </form>
+        </div>
+
+        <div>
+          <h2>Lookup Question</h2>
+          <form id="lookupForm">
+            <textarea name="question_text" placeholder="Enter question text" required></textarea>
+            <button type="submit">Lookup</button>
+          </form>
+          <pre id="lookupResult"></pre>
+        </div>
+      </section>
+
+      <p id="status"></p>
+    </main>
+
+    <script src="/ui/app.js"></script>
+  </body>
+</html>
