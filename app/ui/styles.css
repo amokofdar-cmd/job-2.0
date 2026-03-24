@@ -1,0 +1,103 @@
+:root {
+  font-family: Inter, system-ui, Arial, sans-serif;
+  color: #111827;
+  background: #f3f4f6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+}
+
+header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 18px;
+}
+
+header h1 { margin: 0 0 4px; }
+header p { margin: 0 0 12px; color: #4b5563; }
+
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.panel {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.metric-card {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.metric-card h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.metric-card p {
+  margin: 8px 0 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+input, textarea, select, button {
+  width: 100%;
+  padding: 9px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  margin-bottom: 9px;
+}
+
+button {
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  max-width: 380px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px;
+  text-align: left;
+}
+
+#status { margin: 16px 4px; color: #1d4ed8; font-weight: 600; }
+
+pre { white-space: pre-wrap; background: #f9fafb; padding: 8px; border-radius: 8px; }
