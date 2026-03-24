@@ -32,3 +32,7 @@ class AnswerQuestionRequest(BaseModel):
     question_text: str
     answer_text: str
     approved: bool = True
+
+
+class QuestionLookupRequest(BaseModel):
+    question_text: str

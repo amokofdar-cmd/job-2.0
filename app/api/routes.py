@@ -1,8 +1,9 @@
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.db.session import get_db
 from app.models.entities import (
     ApplicationAttempt,
@@ -15,14 +16,16 @@ from app.schemas.common import (
     CandidateProfileCreate,
     GenerateDraftRequest,
     JobCreate,
+    QuestionLookupRequest,
     RunControlUpdate,
 )
+from app.services.analytics import compute_dashboard_metrics
 from app.services.applicator import HybridApplicator
 from app.services.composer import DraftComposer
 from app.services.llm_router import LLMRouter
 from app.services.matcher import score_job
 from app.services.question_memory import QuestionMemory
-from app.core.config import get_settings
+from app.workers.autopilot import run_cycle
 
 router = APIRouter(prefix="/v1", tags=["job-automation"])
 
@@ -34,6 +37,20 @@ def create_profile(payload: CandidateProfileCreate, db: Session = Depends(get_db
     db.commit()
     db.refresh(profile)
     return {"id": profile.id}
+
+
+@router.get("/profiles")
+def list_profiles(db: Session = Depends(get_db)):
+    items = db.execute(select(CandidateProfile).order_by(desc(CandidateProfile.id))).scalars().all()
+    return [
+        {
+            "id": x.id,
+            "full_name": x.full_name,
+            "email": x.email,
+            "linkedin_url": x.linkedin_url,
+        }
+        for x in items
+    ]
 
 
 @router.post("/jobs")
@@ -48,6 +65,35 @@ def upsert_job(payload: JobCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(job)
     return {"id": job.id, "status": "created"}
+
+
+@router.get("/jobs")
+def list_jobs(
+    applied: bool | None = Query(default=None),
+    tier: str | None = Query(default=None),
+    limit: int = Query(default=100, ge=1, le=500),
+    db: Session = Depends(get_db),
+):
+    stmt = select(JobListing).order_by(desc(JobListing.id)).limit(limit)
+    if applied is not None:
+        stmt = stmt.where(JobListing.applied.is_(applied))
+    if tier:
+        stmt = stmt.where(JobListing.tier == tier)
+    items = db.execute(stmt).scalars().all()
+    return [
+        {
+            "id": x.id,
+            "source": x.source,
+            "company": x.company,
+            "title": x.title,
+            "location": x.location,
+            "url": x.url,
+            "tier": x.tier,
+            "score": x.score,
+            "applied": x.applied,
+        }
+        for x in items
+    ]
 
 
 @router.post("/jobs/{job_id}/score")
@@ -70,6 +116,19 @@ def save_question_answer(payload: AnswerQuestionRequest, db: Session = Depends(g
     qm = QuestionMemory(db)
     item = qm.save(payload.question_text, payload.answer_text, payload.approved)
     return {"id": item.id, "question_key": item.question_key}
+
+
+@router.post("/questions/lookup")
+def lookup_question(payload: QuestionLookupRequest, db: Session = Depends(get_db)):
+    found = QuestionMemory(db).lookup(payload.question_text)
+    if not found:
+        return {"found": False}
+    return {
+        "found": True,
+        "answer": found.answer_text,
+        "approved": found.approved,
+        "question_key": found.question_key,
+    }
 
 
 @router.post("/drafts")
@@ -117,6 +176,34 @@ async def apply_job(job_id: int, profile_id: int, db: Session = Depends(get_db))
     }
 
 
+@router.get("/attempts")
+def list_attempts(limit: int = Query(default=200, ge=1, le=1000), db: Session = Depends(get_db)):
+    items = db.execute(select(ApplicationAttempt).order_by(desc(ApplicationAttempt.id)).limit(limit)).scalars()
+    return [
+        {
+            "id": x.id,
+            "job_id": x.job_id,
+            "channel": x.channel,
+            "status": x.status,
+            "notes": x.notes,
+            "created_at": x.created_at,
+        }
+        for x in items
+    ]
+
+
+@router.get("/dashboard/metrics")
+def dashboard_metrics(db: Session = Depends(get_db)):
+    m = compute_dashboard_metrics(db)
+    return {
+        "total_jobs": m.total_jobs,
+        "applied_jobs": m.applied_jobs,
+        "pending_jobs": m.pending_jobs,
+        "attempts_total": m.attempts_total,
+        "success_rate": m.success_rate,
+    }
+
+
 @router.get("/run-control")
 def get_run_control(db: Session = Depends(get_db)):
     ctrl = db.get(RunControl, 1)
@@ -138,3 +225,9 @@ def update_run_control(payload: RunControlUpdate, db: Session = Depends(get_db))
     db.add(ctrl)
     db.commit()
     return {"is_running": ctrl.is_running}
+
+
+@router.post("/autopilot/run-once")
+async def run_autopilot_once():
+    count = await run_cycle()
+    return {"applied_this_cycle": count}

@@ -1,107 +1,136 @@
 # job-2.0
 
-An autonomous **job discovery + application orchestration** service with:
+An autonomous **job discovery + application orchestration platform** with:
 
-- Continuous job ingestion
-- Resume/cover-letter tailoring
-- OpenRouter multi-LLM failover routing
-- Browser + API application channels
-- Question memory with pause-on-unknown behavior
-- Deduplication, safety controls, and audit logs
+- Backend API + autonomous worker
+- OpenRouter multi-LLM failover generation
+- Web operator console
+- Mobile operator console
+- Question memory with human-in-the-loop fallback
+- Hybrid apply channels (API + browser adapters)
 
-## Why this exists
+## Monorepo layout
 
-Most job automation tools break on one of these:
-
-- Limited ATS/site coverage
-- No robust unknown-question handling
-- No centralized application history
-- No LLM failover strategy
-
-This project provides a modular architecture so each weak point can be improved independently.
+- `app/` Python backend (FastAPI + SQLAlchemy + worker)
+- `web/` React + Vite dashboard
+- `mobile/` Expo React Native app
+- `tests/` backend tests
 
 ---
 
-## Features
+## Backend
 
-### 1) Autonomous search loop
-Background worker keeps scanning registered sources, normalizes listings, deduplicates, and queues matches.
+### Features
 
-### 2) Match tiers
-Jobs are scored into `A`, `B`, `C` tiers to blend direct-fit and adjacent opportunities.
+- Candidate, job, application-attempt, and run-control persistence
+- Job scoring (`A/B/C` tiers)
+- OpenRouter failover model chain
+- Tailored draft generation endpoint
+- Question memory lookup/save for form autofill
+- Manual and autonomous apply workflows
+- Dashboard metrics + attempts history
 
-### 3) LLM failover orchestration (OpenRouter)
-`LLMRouter` accepts an ordered list of models and retries automatically. If one model fails or times out, it moves to the next.
-
-### 4) Hybrid application strategy
-- **API applicator** for stable endpoints
-- **Browser applicator** fallback for dynamic ATS flows
-
-### 5) Question memory
-When a new form question appears:
-- if known => auto-answer
-- if unknown => mark as pending + requires human answer
-
-### 6) Audit + safety
-Every attempt gets an audit record and can be reviewed. Global run can be paused/resumed.
-
----
-
-## Quickstart
-
-### 1. Install
+### Run backend
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .[dev]
-```
-
-### 2. Configure
-
-Copy env and edit:
-
-```bash
 cp .env.example .env
-```
-
-Set:
-
-- `OPENROUTER_API_KEY`
-- `OPENROUTER_MODEL_CHAIN`
-
-### 3. Run API
-
-```bash
 uvicorn app.main:app --reload
 ```
 
-Open: <http://127.0.0.1:8000/docs>
-
-### 4. Run autonomous worker
+### Run autonomous loop
 
 ```bash
 python -m app.workers.autopilot
 ```
 
+API docs: <http://127.0.0.1:8000/docs>
+
 ---
 
-## Architecture
+## Web app (`web/`)
 
-- `app/main.py` FastAPI app + router registration
-- `app/api/routes.py` HTTP endpoints
-- `app/services/llm_router.py` OpenRouter failover + checkpointed prompt flow
-- `app/services/matcher.py` scoring + tiers
-- `app/services/applicator.py` API/browser application channels
-- `app/services/question_memory.py` reusable Q&A memory
-- `app/services/discovery.py` job source orchestrator
-- `app/workers/autopilot.py` continuous loop
-- `app/db/*` persistence and session management
+### Features
+
+- Dashboard metrics cards
+- Job table view
+- Trigger `autopilot/run-once` from UI
+
+### Run web
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Optional env:
+
+```bash
+VITE_API_BASE=http://127.0.0.1:8000/v1
+```
+
+---
+
+## Mobile app (`mobile/`)
+
+### Features
+
+- Dashboard metrics view
+- Jobs feed
+- Trigger autopilot run
+- Open job links externally
+
+### Run mobile
+
+```bash
+cd mobile
+npm install
+npm run start
+```
+
+Optional env:
+
+```bash
+EXPO_PUBLIC_API_BASE=http://127.0.0.1:8000/v1
+```
+
+---
+
+## Core API endpoints
+
+- `POST /v1/profiles`
+- `GET /v1/profiles`
+- `POST /v1/jobs`
+- `GET /v1/jobs`
+- `POST /v1/jobs/{job_id}/score`
+- `POST /v1/drafts`
+- `POST /v1/questions`
+- `POST /v1/questions/lookup`
+- `POST /v1/jobs/{job_id}/apply`
+- `GET /v1/attempts`
+- `GET /v1/dashboard/metrics`
+- `GET/PATCH /v1/run-control`
+- `POST /v1/autopilot/run-once`
+
+---
+
+## OpenRouter failover
+
+Set in `.env`:
+
+```env
+OPENROUTER_MODEL_CHAIN=model-a:free,model-b:free,model-c:free
+```
+
+Router tries models in order and returns first successful completion.
 
 ---
 
 ## Notes
 
-- This repository includes a production-style skeleton with working core logic.
-- Platform-specific submitters (Ashby/Greenhouse/Workday/LinkedIn) are represented through adapters and should be expanded with each site’s approved integration path.
-- Keep all candidate data truthful and policy-compliant.
+- This is a complete full-stack baseline with production-oriented structure.
+- ATS-specific adapters (Ashby/Greenhouse/Lever/Workday/LinkedIn) should be implemented in `app/services/applicator.py` and discovery sources.
+- Keep all candidate claims truthful and policy-compliant.
