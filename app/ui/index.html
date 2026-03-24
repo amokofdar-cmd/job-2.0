@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>job-2.0 full app</title>
+    <link rel="stylesheet" href="/ui-static/styles.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1>job-2.0</h1>
+        <button data-tab="dashboard" class="tab active">Dashboard</button>
+        <button data-tab="profiles" class="tab">Profiles</button>
+        <button data-tab="jobs" class="tab">Jobs</button>
+        <button data-tab="apply" class="tab">Apply</button>
+        <button id="refreshAll" class="outline">Refresh all</button>
+      </aside>
+
+      <main class="content">
+        <section id="dashboard" class="panel visible">
+          <div class="panel-header">
+            <h2>Dashboard</h2>
+            <button id="runAutopilot">Run Autopilot Once</button>
+          </div>
+          <div id="metricsGrid" class="grid"></div>
+          <h3>Recent attempts</h3>
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Job ID</th><th>Channel</th><th>Status</th><th>Notes</th></tr>
+            </thead>
+            <tbody id="attemptRows"></tbody>
+          </table>
+        </section>
+
+        <section id="profiles" class="panel">
+          <h2>Create Profile</h2>
+          <form id="profileForm" class="stack">
+            <input name="full_name" placeholder="Full name" required />
+            <input name="email" placeholder="Email" required />
+            <input name="linkedin_url" placeholder="LinkedIn URL" />
+            <textarea name="master_resume" placeholder="Paste resume text" rows="8" required></textarea>
+            <button type="submit">Save profile</button>
+          </form>
+          <h3>Existing profiles</h3>
+          <ul id="profileList"></ul>
+        </section>
+
+        <section id="jobs" class="panel">
+          <h2>Add Job</h2>
+          <form id="jobForm" class="stack">
+            <input name="source" placeholder="Source (greenhouse, ashby...)" required />
+            <input name="company" placeholder="Company" required />
+            <input name="title" placeholder="Title" required />
+            <input name="location" placeholder="Location" />
+            <input name="url" placeholder="Job URL" required />
+            <textarea name="description" placeholder="Job description" rows="6" required></textarea>
+            <button type="submit">Save job</button>
+          </form>
+
+          <h3>Jobs</h3>
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Company</th><th>Title</th><th>Tier</th><th>Score</th><th>Applied</th></tr>
+            </thead>
+            <tbody id="jobRows"></tbody>
+          </table>
+        </section>
+
+        <section id="apply" class="panel">
+          <h2>Manual Apply & Questions</h2>
+          <form id="applyForm" class="stack inline">
+            <input name="profile_id" type="number" placeholder="Profile ID" required />
+            <input name="job_id" type="number" placeholder="Job ID" required />
+            <button type="submit">Apply now</button>
+          </form>
+
+          <form id="qaForm" class="stack">
+            <h3>Store reusable question answer</h3>
+            <textarea name="question_text" placeholder="Question text" rows="3" required></textarea>
+            <textarea name="answer_text" placeholder="Answer text" rows="3" required></textarea>
+            <button type="submit">Save answer</button>
+          </form>
+
+          <pre id="actionOutput"></pre>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/ui-static/app.js"></script>
+  </body>
+</html>
