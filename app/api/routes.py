@@ -231,3 +231,58 @@ def update_run_control(payload: RunControlUpdate, db: Session = Depends(get_db))
 async def run_autopilot_once():
     count = await run_cycle()
     return {"applied_this_cycle": count}
+
+
+@router.post("/dev/seed-demo")
+def seed_demo_data(db: Session = Depends(get_db)):
+    existing_profile = db.execute(select(CandidateProfile).limit(1)).scalar_one_or_none()
+    if not existing_profile:
+        profile = CandidateProfile(
+            full_name="Demo Candidate",
+            email="demo@example.com",
+            linkedin_url="https://linkedin.com/in/demo",
+            master_resume=(
+                "Python backend engineer with FastAPI, SQL, cloud, automation, and API integration experience."
+            ),
+            preferences_json='{"roles":["software engineer","backend engineer"],"remote":true}',
+        )
+        db.add(profile)
+        db.commit()
+
+    sample_jobs = [
+        JobCreate(
+            source="greenhouse",
+            company="Acme AI",
+            title="Backend Engineer",
+            location="Remote",
+            url="https://jobs.example.com/acme-backend-1",
+            description="Build Python APIs with FastAPI and SQL. Work on cloud services.",
+        ),
+        JobCreate(
+            source="ashby",
+            company="Nimbus Labs",
+            title="Platform Engineer",
+            location="US Remote",
+            url="https://jobs.example.com/nimbus-platform-2",
+            description="Infrastructure, automation, reliability, and backend service ownership.",
+        ),
+        JobCreate(
+            source="workday",
+            company="Orbit Systems",
+            title="Technical Program Manager",
+            location="Hybrid",
+            url="https://jobs.example.com/orbit-tpm-3",
+            description="Cross-functional delivery, stakeholder management, technical operations.",
+        ),
+    ]
+
+    created = 0
+    for payload in sample_jobs:
+        exists = db.execute(select(JobListing).where(JobListing.url == payload.url)).scalar_one_or_none()
+        if exists:
+            continue
+        db.add(JobListing(**payload.model_dump()))
+        created += 1
+
+    db.commit()
+    return {"status": "ok", "jobs_created": created}
