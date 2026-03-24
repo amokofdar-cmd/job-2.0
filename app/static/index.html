@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>job-2.0 full app</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <header>
+        <h1>job-2.0 Full App</h1>
+        <p>Create profile, ingest jobs, score/apply, and monitor autonomous runs.</p>
+      </header>
+
+      <section class="panel">
+        <h2>Quick Start</h2>
+        <div class="row">
+          <button id="seedBtn">Seed Demo Data</button>
+          <button id="refreshBtn">Refresh All</button>
+          <button id="runAutoBtn">Run Autopilot Once</button>
+        </div>
+      </section>
+
+      <section class="grid-2">
+        <div class="panel">
+          <h2>Create Profile</h2>
+          <form id="profileForm" class="stack">
+            <input name="full_name" placeholder="Full name" required />
+            <input name="email" placeholder="Email" required type="email" />
+            <input name="linkedin_url" placeholder="LinkedIn URL" />
+            <textarea name="master_resume" placeholder="Master resume text" required></textarea>
+            <button type="submit">Save Profile</button>
+          </form>
+          <div id="profiles"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Add Job</h2>
+          <form id="jobForm" class="stack">
+            <input name="source" placeholder="Source (ashby/greenhouse/workday)" required />
+            <input name="company" placeholder="Company" required />
+            <input name="title" placeholder="Title" required />
+            <input name="location" placeholder="Location" />
+            <input name="url" placeholder="Job URL" required />
+            <textarea name="description" placeholder="Description" required></textarea>
+            <button type="submit">Add Job</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Dashboard Metrics</h2>
+        <div id="metrics" class="metrics"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Job Pipeline</h2>
+        <p>Select profile ID below and run score/apply per job.</p>
+        <label>Active Profile ID: <input id="activeProfileId" type="number" min="1" value="1" /></label>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Company</th>
+              <th>Title</th>
+              <th>Tier</th>
+              <th>Score</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="jobsTable"></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>Question Memory</h2>
+        <form id="questionForm" class="row wrap">
+          <input name="question_text" placeholder="Question text" required />
+          <input name="answer_text" placeholder="Answer text" required />
+          <button type="submit">Save Answer</button>
+        </form>
+        <form id="lookupForm" class="row wrap">
+          <input name="question_text" placeholder="Lookup question" required />
+          <button type="submit">Lookup</button>
+        </form>
+        <pre id="lookupResult"></pre>
+      </section>
+
+      <section class="panel">
+        <h2>Application Attempts</h2>
+        <div id="attempts"></div>
+      </section>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
