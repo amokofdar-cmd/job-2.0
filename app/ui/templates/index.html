@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>job-2.0 Full App</title>
+    <link rel="stylesheet" href="/ui/static/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>job-2.0 Full Operator App</h1>
+      <div class="actions">
+        <button id="refresh-all">Refresh</button>
+        <button id="run-once">Run Autopilot Once</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>System Status</h2>
+        <div id="status-grid" class="grid"></div>
+        <div class="inline">
+          <span>Autopilot:</span>
+          <button id="autopilot-toggle">Loading...</button>
+        </div>
+      </section>
+
+      <section class="panel two-col">
+        <div>
+          <h2>Create Candidate Profile</h2>
+          <form id="profile-form">
+            <input name="full_name" placeholder="Full Name" required />
+            <input name="email" type="email" placeholder="Email" required />
+            <input name="linkedin_url" placeholder="LinkedIn URL" />
+            <textarea name="master_resume" placeholder="Paste resume text" rows="8" required></textarea>
+            <button type="submit">Create Profile</button>
+          </form>
+        </div>
+        <div>
+          <h2>Profiles</h2>
+          <div id="profiles-list" class="list"></div>
+        </div>
+      </section>
+
+      <section class="panel two-col">
+        <div>
+          <h2>Add Job</h2>
+          <form id="job-form">
+            <input name="source" placeholder="Source (linkedin, greenhouse...)" required />
+            <input name="company" placeholder="Company" required />
+            <input name="title" placeholder="Title" required />
+            <input name="location" placeholder="Location" />
+            <input name="url" placeholder="Job URL" required />
+            <textarea name="description" placeholder="Job description" rows="6" required></textarea>
+            <button type="submit">Add Job</button>
+          </form>
+        </div>
+        <div>
+          <h2>Question Memory</h2>
+          <form id="question-form">
+            <textarea name="question_text" placeholder="Question text" rows="3" required></textarea>
+            <textarea name="answer_text" placeholder="Approved answer" rows="3" required></textarea>
+            <button type="submit">Save Answer</button>
+          </form>
+          <form id="question-lookup-form">
+            <input name="lookup_question" placeholder="Lookup existing question" required />
+            <button type="submit">Lookup</button>
+          </form>
+          <pre id="question-lookup-result"></pre>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Jobs Queue</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Company</th>
+              <th>Title</th>
+              <th>Tier</th>
+              <th>Score</th>
+              <th>Applied</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="jobs-body"></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>Application Attempts</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Job ID</th>
+              <th>Channel</th>
+              <th>Status</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="attempts-body"></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>API Console Output</h2>
+        <pre id="console"></pre>
+      </section>
+    </main>
+
+    <script src="/ui/static/app.js"></script>
+  </body>
+</html>
